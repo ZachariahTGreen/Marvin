@@ -5,7 +5,6 @@
 Robot robot;
 World world;
 void setup() {
-  initializeWorld(&world); 
   Serial.begin(9600);
   robot.turn(90);
 }
