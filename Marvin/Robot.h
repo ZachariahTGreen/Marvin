@@ -102,7 +102,7 @@ void Robot::turn(Angle angle) {
   this->servoRight.attach(pinServoRight ); // Attach right signal to pin 11
   this->servoLeft.writeMicroseconds(directionCode);
   this->servoRight.writeMicroseconds(directionCode);
-  delay(tDelay);
+  delay(duration);
   this->servoLeft.writeMicroseconds(1500);
   this->servoRight.writeMicroseconds(1500);
   this->servoLeft.detach();
