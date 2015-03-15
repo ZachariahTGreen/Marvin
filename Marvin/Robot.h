@@ -1,5 +1,6 @@
 #ifndef Robot_h
 #define Robot_h
+
 #include "Point.h"
 #include "World.h"
 #include "Arduino.h"
@@ -9,7 +10,6 @@ typedef int Angle;
 class Robot {
 public:
     Robot();
-    void turnRobot(int, int);
     void turn(Angle);
     void updateCurrentPosition();
 //private:
@@ -18,13 +18,6 @@ public:
     Servo servoLeft;                             
     Servo servoRight;
 };
-//struct Robot {
-//    Point center;
-//    Angle facing;
-//    Servo servoLeft;                             
-//    Servo servoRight;
-//};
-//typedef struct Robot Robot;
 
 const int pinFront = 4;
 const int pinRight = 2;
@@ -33,8 +26,8 @@ const int pinBack = 9;
 const int pinFrontRight = 3;
 const int pinFrontLeft = 10;
 
-const int pinServoLeft = 12;
 const int pinServoRight = 11;
+const int pinServoLeft = 12;
 
 long microsecondsToInches(long microseconds) {
   // According to Parallax's datasheet for the PING))), there are
@@ -65,8 +58,8 @@ Robot::Robot() {
   this->center.x = 0;
   this->center.y = 0;
   this->facing = 0.0;
-  this->servoLeft.attach(pinServoLeft); // Attach left signal to pin 12
-  this->servoRight.attach(pinServoRight ); // Attach right signal to pin 11
+  this->servoLeft.attach(pinServoLeft);
+  this->servoRight.attach(pinServoRight);
 }
 
 void Robot::updateCurrentPosition() {
@@ -79,7 +72,8 @@ void Robot::updateCurrentPosition() {
     back = getFreeDistance(pinBack) + 4;
     left = getFreeDistance(pinLeft) + 3;
     xDifference = xMax - right - left;
-    yDifference = yMax - front - back;  
+    yDifference = yMax - front - back; 
+
     if (yDifference == 0){
       this->center.y = back;
     }
@@ -87,18 +81,6 @@ void Robot::updateCurrentPosition() {
       this->center.x = left;
     }
   }
-}
-
-void Robot::turnRobot(int directionCode, int tDelay) {
-  this->servoLeft.attach(pinServoLeft); // Attach left signal to pin 12
-  this->servoRight.attach(pinServoRight ); // Attach right signal to pin 11
-  this->servoLeft.writeMicroseconds(directionCode);
-  this->servoRight.writeMicroseconds(directionCode);
-  delay(tDelay);
-  this->servoLeft.writeMicroseconds(1500);
-  this->servoRight.writeMicroseconds(1500);
-  this->servoLeft.detach();
-  this->servoRight.detach();
 }
 
 void Robot::turn(Angle angle) {
@@ -109,30 +91,22 @@ void Robot::turn(Angle angle) {
   angle = abs(angle);
 
   // These values come from calibrating the robot and stuff, you know whatevs.
-  int direction = isLeft ? 1300 : 1700;
+  int directionCode = isLeft ? 1300 : 1700;
   int duration = (int)(angle / 90.0 * 800) - (isLeft ? 0 : 20);
-  Serial.print(direction);
+  Serial.print(directionCode);
   Serial.print(" ");
   Serial.print(duration);
   Serial.println();
-  this->turnRobot(direction, duration);
-}
 
-
-void turnLeft90(Robot* robot) {
-  // Turn Left 90 degrees
-  robot->turnRobot(1300, 800);
-}
-void turnLeft45(Robot* robot) {
-  // Turn Left 45 Degrees
-  robot->turnRobot(1300, 400);
-}
-void turnRight90(Robot* robot) {
-  // Turn Right 90 degrees
-  robot->turnRobot(1700, 780);
-}
-void turnRight45(Robot* robot) {
-  robot->turnRobot(1700, 380);
+  this->servoLeft.attach(pinServoLeft); // Attach left signal to pin 12
+  this->servoRight.attach(pinServoRight ); // Attach right signal to pin 11
+  this->servoLeft.writeMicroseconds(directionCode);
+  this->servoRight.writeMicroseconds(directionCode);
+  delay(duration);
+  this->servoLeft.writeMicroseconds(1500);
+  this->servoRight.writeMicroseconds(1500);
+  this->servoLeft.detach();
+  this->servoRight.detach();
 }
 
 #endif
