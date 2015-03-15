@@ -17,7 +17,7 @@ World::World() {
     this->x[i] = i+1;
   }
   for (int j = 0; j < yMax; j++){
-    this->y[j] = i+1;
+    this->y[j] = j+1;
   }
 }
 
