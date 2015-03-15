@@ -4,22 +4,20 @@
 const int xMax = 48;
 const int yMax = 78;
 
-struct World {   
+class World {
+public:
+    World();
+//private:
     int x[xMax];
     int y[yMax];
 };
-typedef struct World World;
 
-void initializeWorld(World* world) {
-  int X = 1;
-  int Y = 1;
-  for (int k; k < xMax; k++){
-    world->x[k] = X;
-    X++;  
+World::World() {
+  for (int i = 0; i < xMax; i++){
+    this->x[i] = i+1;
   }
-  for (int j; j < yMax; j++){
-    world->y[j] = Y;
-    Y++; 
+  for (int j = 0; j < yMax; j++){
+    this->y[j] = j+1;
   }
 }
 
