@@ -12,6 +12,7 @@ public:
     Robot();
     void turn(Angle);
     void updateCurrentPosition();
+    void moveForward(int);
 //private:
     Point center;
     Angle facing;
@@ -29,6 +30,12 @@ const int pinFrontLeft = 10;
 const int pinServoRight = 11;
 const int pinServoLeft = 12;
 
+const long forwardSpeed = 5.0;
+const int forwardLeftSpeed = 1700;
+const int forwardRightSpeed = 1400;
+
+const int leftTurnDuration = 1200;
+const int rightTurnAdjustment = 400;
 long microsecondsToInches(long microseconds) {
   // According to Parallax's datasheet for the PING))), there are
   // 73.746 microseconds per inch (i.e. sound travels at 1130 feet per
@@ -58,8 +65,6 @@ Robot::Robot() {
   this->center.x = 0;
   this->center.y = 0;
   this->facing = 0.0;
-  this->servoLeft.attach(pinServoLeft);
-  this->servoRight.attach(pinServoRight);
 }
 
 void Robot::updateCurrentPosition() {
@@ -82,7 +87,17 @@ void Robot::updateCurrentPosition() {
     }
   }
 }
-
+void Robot::moveForward(int distance){
+  long duration;
+  duration = (distance/forwardSpeed) * 1000;
+  this->servoLeft.attach(pinServoLeft); 
+  this->servoRight.attach(pinServoRight);
+  this->servoLeft.writeMicroseconds(forwardLeftSpeed);
+  this->servoRight.writeMicroseconds(forwardRightSpeed);
+  delay(duration);
+  this->servoLeft.detach();
+  this->servoRight.detach();
+}
 void Robot::turn(Angle angle) {
   // Turn Left angle degrees / Turn Right -angle degrees
 
@@ -92,14 +107,14 @@ void Robot::turn(Angle angle) {
 
   // These values come from calibrating the robot and stuff, you know whatevs.
   int directionCode = isLeft ? 1300 : 1700;
-  int duration = (int)(angle / 90.0 * 800) - (isLeft ? 0 : 20);
+  int duration = (int)(angle / 90.0 * leftTurnDuration) - (isLeft ? 0 : rightTurnAdjustment);
   Serial.print(directionCode);
   Serial.print(" ");
   Serial.print(duration);
   Serial.println();
 
-  this->servoLeft.attach(pinServoLeft); // Attach left signal to pin 12
-  this->servoRight.attach(pinServoRight ); // Attach right signal to pin 11
+  this->servoLeft.attach(pinServoLeft); 
+  this->servoRight.attach(pinServoRight); 
   this->servoLeft.writeMicroseconds(directionCode);
   this->servoRight.writeMicroseconds(directionCode);
   delay(duration);
