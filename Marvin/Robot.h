@@ -11,8 +11,9 @@ class Robot {
 public:
     Robot();
     void turn(Angle);
-    void updateCurrentPosition();
+    void startPosition();
     void moveForward(int);
+    void detectObstacle(Point);
 //private:
     Point center;
     Angle facing;
@@ -27,6 +28,9 @@ const int pinBack = 9;
 const int pinFrontRight = 3;
 const int pinFrontLeft = 10;
 
+const int verticalOffset = 4;
+const int horizontalOffset = 3;
+
 const int pinServoRight = 11;
 const int pinServoLeft = 12;
 
@@ -36,6 +40,7 @@ const int forwardRightSpeed = 1400;
 
 const int leftTurnDuration = 1200;
 const int rightTurnAdjustment = 400;
+
 long microsecondsToInches(long microseconds) {
   // According to Parallax's datasheet for the PING))), there are
   // 73.746 microseconds per inch (i.e. sound travels at 1130 feet per
@@ -64,18 +69,18 @@ long getFreeDistance(int pin) {
 Robot::Robot() {
   this->center.x = 0;
   this->center.y = 0;
-  this->facing = 0.0;
+  this->facing = 0;
 }
 
-void Robot::updateCurrentPosition() {
+void Robot::startPosition() {
   long front,left,right,back;
   int xDifference;
   int yDifference;
   for (int i = 0; i < 6; i++) {
-    front = getFreeDistance(pinFront) + 4;
-    right = getFreeDistance(pinRight) + 3;
-    back = getFreeDistance(pinBack) + 4;
-    left = getFreeDistance(pinLeft) + 3;
+    front = getFreeDistance(pinFront) + verticalOffset;
+    right = getFreeDistance(pinRight) + horizontalOffset;
+    back = getFreeDistance(pinBack) + verticalOffset;
+    left = getFreeDistance(pinLeft) + horizontalOffset;
     xDifference = xMax - right - left;
     yDifference = yMax - front - back; 
 
@@ -87,6 +92,20 @@ void Robot::updateCurrentPosition() {
     }
   }
 }
+
+void Robot::detectObstacle(Point obstacle){
+  long front, frontLeft, frontRight;
+  front = getFreeDistance(pinFront);
+  frontLeft = getFreeDistance(pinFrontLeft);
+  frontRight = getFreeDistance(pinFrontRight);
+  
+  if (this.facing == 0){
+    obstacle.x = robot.center.x;
+    obstacle.y = robot.center.y + front + verticalOffset;
+    
+  }
+}
+
 void Robot::moveForward(int distance){
   long duration;
   duration = (distance/forwardSpeed) * 1000;
@@ -95,6 +114,18 @@ void Robot::moveForward(int distance){
   this->servoLeft.writeMicroseconds(forwardLeftSpeed);
   this->servoRight.writeMicroseconds(forwardRightSpeed);
   delay(duration);
+  if (this.facing == 0){
+    this.center.y = this.center.y + distance;
+  }
+  if (this.facing == 1){
+    this.center.x = this.center.x - distance;
+  }
+  if (this.facing == 2){
+    this.center.y =this.center.y - distance;
+  }
+  if (this.facing == 3){
+    this.center.x = this.center.x + distance;
+  }
   this->servoLeft.detach();
   this->servoRight.detach();
 }
@@ -108,11 +139,7 @@ void Robot::turn(Angle angle) {
   // These values come from calibrating the robot and stuff, you know whatevs.
   int directionCode = isLeft ? 1300 : 1700;
   int duration = (int)(angle / 90.0 * leftTurnDuration) - (isLeft ? 0 : rightTurnAdjustment);
-  Serial.print(directionCode);
-  Serial.print(" ");
-  Serial.print(duration);
-  Serial.println();
-
+  
   this->servoLeft.attach(pinServoLeft); 
   this->servoRight.attach(pinServoRight); 
   this->servoLeft.writeMicroseconds(directionCode);
