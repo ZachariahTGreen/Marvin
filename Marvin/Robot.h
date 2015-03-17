@@ -13,7 +13,7 @@ public:
     void turn(Angle);
     void startPosition();
     void moveForward(int);
-    void detectObstacle(Point);
+    void detectObstacle(World, Point);
 //private:
     Point center;
     Angle facing;
@@ -93,17 +93,21 @@ void Robot::startPosition() {
   }
 }
 
-void Robot::detectObstacle(Point obstacle){
+void Robot::detectObstacle(World world, Point obstacle){
   long front, frontLeft, frontRight;
   front = getFreeDistance(pinFront);
   frontLeft = getFreeDistance(pinFrontLeft);
   frontRight = getFreeDistance(pinFrontRight);
   
-  if (this.facing == 0){
-    obstacle.x = robot.center.x;
-    obstacle.y = robot.center.y + front + verticalOffset;
-    
+  if (this->facing == 0){
+    //Front sensor obstacle
+    obstacle.x = this->center.x;
+    obstacle.y = this->center.y + front + verticalOffset;
+    world.registerObstacle(obstacle);
+    //Front Left sensor obstacle
+    //obstacle.x = robot.center.x
   }
+  
 }
 
 void Robot::moveForward(int distance){
@@ -114,17 +118,17 @@ void Robot::moveForward(int distance){
   this->servoLeft.writeMicroseconds(forwardLeftSpeed);
   this->servoRight.writeMicroseconds(forwardRightSpeed);
   delay(duration);
-  if (this.facing == 0){
-    this.center.y = this.center.y + distance;
+  if (this->facing == 0){
+    this->center.y = this->center.y + distance;
   }
-  if (this.facing == 1){
-    this.center.x = this.center.x - distance;
+  if (this->facing == 1){
+    this->center.x = this->center.x - distance;
   }
-  if (this.facing == 2){
-    this.center.y =this.center.y - distance;
+  if (this->facing == 2){
+    this->center.y =this->center.y - distance;
   }
-  if (this.facing == 3){
-    this.center.x = this.center.x + distance;
+  if (this->facing == 3){
+    this->center.x = this->center.x + distance;
   }
   this->servoLeft.detach();
   this->servoRight.detach();

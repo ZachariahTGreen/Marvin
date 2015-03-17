@@ -23,12 +23,12 @@ void setup() {
   destination.x = 23;
   destination.y = 46;
   Serial.begin(9600);
-  robot.updateCurrentPosition();
+  robot.startPosition();
   printInformation();
 }
 
 void loop() {
-  robot.updateCurrentPosition();
+  robot.startPosition();
   printInformation();
   delay(1000);
 }
