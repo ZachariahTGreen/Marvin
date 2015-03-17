@@ -4,6 +4,7 @@
 #include "Point.h"
 #include "World.h"
 #include "Arduino.h"
+#include "math.h"
 
 typedef int Angle;
 
@@ -13,7 +14,7 @@ public:
     void turn(Angle);
     void startPosition();
     void moveForward(int);
-    void detectObstacle(World, Point);
+    void detectObstacle(World&, Point);
 //private:
     Point center;
     Angle facing;
@@ -40,6 +41,11 @@ const int forwardRightSpeed = 1400;
 
 const int leftTurnDuration = 1200;
 const int rightTurnAdjustment = 400;
+
+const int faceForward = 0;
+const int faceLeft = 1;
+const int faceRight = 3;
+const int faceBackward = 2;
 
 long microsecondsToInches(long microseconds) {
   // According to Parallax's datasheet for the PING))), there are
@@ -93,21 +99,68 @@ void Robot::startPosition() {
   }
 }
 
-void Robot::detectObstacle(World world, Point obstacle){
+void Robot::detectObstacle(World& world, Point obstacle){
   long front, frontLeft, frontRight;
   front = getFreeDistance(pinFront);
   frontLeft = getFreeDistance(pinFrontLeft);
   frontRight = getFreeDistance(pinFrontRight);
   
-  if (this->facing == 0){
+  if (this->facing == faceForward){
     //Front sensor obstacle
     obstacle.x = this->center.x;
     obstacle.y = this->center.y + front + verticalOffset;
     world.registerObstacle(obstacle);
     //Front Left sensor obstacle
-    //obstacle.x = robot.center.x
+    obstacle.x = this->center.x - (int)(frontLeft * sin(M_PI_4));
+    obstacle.y = this->center.y + (int)(frontLeft * cos(M_PI_4));
+    world.registerObstacle(obstacle);
+    //Front Right sensor obstacle
+    obstacle.x = this->center.x + (int)(frontRight * sin(M_PI_4));
+    obstacle.y = this->center.y + (int)(frontRight * cos(M_PI_4));
+    world.registerObstacle(obstacle);
   }
-  
+  if (this->facing == faceLeft){
+    //Front sensor obstacle
+    obstacle.y = this->center.y;
+    obstacle.x = this->center.x - front - verticalOffset;
+    world.registerObstacle(obstacle);
+    //Front Left sensor obstacle
+    obstacle.y = this->center.y - (int)(frontLeft * sin(M_PI_4));
+    obstacle.x = this->center.x - (int)(frontLeft * cos(M_PI_4));
+    world.registerObstacle(obstacle);
+    //Front Right sensor obstacle
+    obstacle.y = this->center.y + (int)(frontRight * sin(M_PI_4));
+    obstacle.x = this->center.x - (int)(frontRight * cos(M_PI_4));
+    world.registerObstacle(obstacle);
+  }
+  if (this->facing == faceRight){
+    //Front sensor obstacle
+    obstacle.y = this->center.y;
+    obstacle.x = this->center.x + front + verticalOffset;
+    world.registerObstacle(obstacle);
+    //Front Left sensor obstacle
+    obstacle.y = this->center.y + (int)(frontLeft * sin(M_PI_4));
+    obstacle.x = this->center.x + (int)(frontLeft * cos(M_PI_4));
+    world.registerObstacle(obstacle);
+    //Front Right sensor obstacle
+    obstacle.y = this->center.y - (int)(frontRight * sin(M_PI_4));
+    obstacle.x = this->center.x + (int)(frontRight * cos(M_PI_4));
+    world.registerObstacle(obstacle);
+  }
+  if (this->facing == faceBackward){
+    //Front sensor obstacle
+    obstacle.x = this->center.x;
+    obstacle.y = this->center.y - front - verticalOffset;
+    world.registerObstacle(obstacle);
+    //Front Left sensor obstacle
+    obstacle.x = this->center.x + (int)(frontLeft * sin(M_PI_4));
+    obstacle.y = this->center.y - (int)(frontLeft * cos(M_PI_4));
+    world.registerObstacle(obstacle);
+    //Front Right sensor obstacle
+    obstacle.x = this->center.x - (int)(frontRight * sin(M_PI_4));
+    obstacle.y = this->center.y - (int)(frontRight * cos(M_PI_4));
+    world.registerObstacle(obstacle);
+  }
 }
 
 void Robot::moveForward(int distance){
@@ -118,16 +171,16 @@ void Robot::moveForward(int distance){
   this->servoLeft.writeMicroseconds(forwardLeftSpeed);
   this->servoRight.writeMicroseconds(forwardRightSpeed);
   delay(duration);
-  if (this->facing == 0){
+  if (this->facing == faceForward){
     this->center.y = this->center.y + distance;
   }
-  if (this->facing == 1){
+  if (this->facing == faceLeft){
     this->center.x = this->center.x - distance;
   }
-  if (this->facing == 2){
+  if (this->facing == faceBackward){
     this->center.y =this->center.y - distance;
   }
-  if (this->facing == 3){
+  if (this->facing == faceRight){
     this->center.x = this->center.x + distance;
   }
   this->servoLeft.detach();
