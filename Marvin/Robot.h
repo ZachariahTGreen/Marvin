@@ -16,23 +16,19 @@ const Inches verticalOffset = 4;
 const Inches horizontalOffset = 3;
 const Inches angleOffset = 4;
 
-const int pinServoRight = 11;
-const int pinServoLeft = 12;
-
-const long forwardSpeed = 5.0;
+const long forwardSpeed = 4.0;
 const int forwardLeftSpeed = 1700;
 const int forwardRightSpeed = 1400;
 
-const int leftTurnDuration = 1200;
-const int rightTurnAdjustment = 400;
+const int leftTurnDuration = 800;
+const int rightTurnAdjustment = 0;
 
 class Robot {
 public:
     Robot();
     void turn(Radians);
     void startPosition();
-    void moveForward(int);
-    void detectObstacle(World&);
+    void moveForward(double);
     Radians getOrientation();
     Point getCenter();
     

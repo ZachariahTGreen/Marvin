@@ -28,28 +28,32 @@ Point Robot::getCenter() {
 }
 
 void Robot::startPosition() {
-  //This works only if not objects in the way of the four sensors.
+  //This works only if no objects in the way of the four sensors.
   long front,left,right,back;
   int xDifference;
   int yDifference;
-  for (int i = 0; i < 5; i++) {
+  //loops until it gets a good reading for center point since sensors vary in readings
+  while (this->center.y == 0){
     front = this->frontSensor->getFreeDistance() + verticalOffset;
-    right = this->rightSensor->getFreeDistance() + horizontalOffset;
     back = this->backSensor->getFreeDistance() + verticalOffset;
-    left = this->leftSensor->getFreeDistance() + horizontalOffset;
-    xDifference = xMax - right - left;
     yDifference = yMax - front - back; 
 
     if (yDifference == 0){
       this->center.y = back;
     }
+  }
+  while (this->center.x == 0){
+    right = this->rightSensor->getFreeDistance() + horizontalOffset;
+    left = this->leftSensor->getFreeDistance() + horizontalOffset;
+    xDifference = xMax - right - left;
+    
     if (xDifference == 0){
       this->center.x = left;
     }
   }
 }
 
-void Robot::moveForward(int distance){
+void Robot::moveForward(double distance){
   long duration;
   duration = (distance/forwardSpeed) * 1000;
   this->servoLeft.attach(PIN_SERVO_LEFT); 
@@ -57,19 +61,9 @@ void Robot::moveForward(int distance){
   this->servoLeft.writeMicroseconds(forwardLeftSpeed);
   this->servoRight.writeMicroseconds(forwardRightSpeed);
   delay(duration);
-  /*
-  if (this->facing == faceForward){
-    this->center.y = this->center.y + distance;
-  }
-  if (this->facing == faceLeft){
-    this->center.x = this->center.x - distance;
-  }
-  if (this->facing == faceBackward){
-    this->center.y =this->center.y - distance;
-  }
-  if (this->facing == faceRight){
-    this->center.x = this->center.x + distance;
-  }*/
+  // Update current position while moving
+  this->center.x = this->center.x + (distance * cos(this->orientation));
+  this->center.y = this->center.y + (distance * sin(this->orientation));
   this->servoLeft.detach();
   this->servoRight.detach();
 }
@@ -81,7 +75,7 @@ void Robot::turn(Radians angle) {
   
   angle = abs(angle);
 
-  // These values come from calibrating the robot and stuff, you know whatevs.
+  // These values come from calibrating the robot
   int directionCode = isLeft ? 1300 : 1700;
   int duration = (int)(angle / M_PI_2 * leftTurnDuration) - (isLeft ? 0 : rightTurnAdjustment);
   
