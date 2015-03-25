@@ -16,7 +16,7 @@ const Inches verticalOffset = 4;
 const Inches horizontalOffset = 3;
 const Inches angleOffset = 4;
 
-const long forwardSpeed = 4.0;
+const long forwardSpeed = 5.0;
 const int forwardLeftSpeed = 1700;
 const int forwardRightSpeed = 1400;
 
@@ -31,7 +31,8 @@ public:
     void moveForward(double);
     Radians getOrientation();
     Point getCenter();
-    
+    void moveTo(Point);
+    void adjustHeading(Point);
 //private:
     Point center;
     Radians orientation;

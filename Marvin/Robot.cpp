@@ -54,7 +54,7 @@ void Robot::startPosition() {
 }
 
 void Robot::moveForward(double distance){
-  long duration;
+  double duration;
   duration = (distance/forwardSpeed) * 1000;
   this->servoLeft.attach(PIN_SERVO_LEFT); 
   this->servoRight.attach(PIN_SERVO_RIGHT);
@@ -66,6 +66,21 @@ void Robot::moveForward(double distance){
   this->center.y = this->center.y + (distance * sin(this->orientation));
   this->servoLeft.detach();
   this->servoRight.detach();
+}
+void Robot::moveTo(Point point){
+  //Robot move toward a desired point in the World grid
+  double distance;
+  distance = sqrt(square(point.x - this->center.x) + square(point.y - this->center.y));
+  adjustHeading(point);
+  moveForward(distance);
+}
+void Robot::adjustHeading(Point point){
+  // adjusts heading toward destination
+  double Yheading, Xheading, headingRadians;
+  Xheading = point.x - this->center.x;
+  Yheading = point.y - this->center.y;
+  headingRadians = atan2(Xheading, Yheading);
+  this->turn(abs(headingRadians));
 }
 void Robot::turn(Radians angle) {
   // Turn Left angle radians / Turn Right -angle radians 
