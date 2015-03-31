@@ -25,6 +25,7 @@ void World::updateHGrid(){
 
 void World::offerHGridValue(GridPoint cell, int value){
     if(!isGridSectionFree(cell)) { return; }
+    if(value > 20) { return; } 
 
     int gridValue = this->hGrid[cell.x - 1][cell.y - 1];
     if(0 <= gridValue && gridValue <= value) { return; }
@@ -32,14 +33,16 @@ void World::offerHGridValue(GridPoint cell, int value){
     this->hGrid[cell.x - 1][cell.y - 1] = value;
     
     // Print the hGrid at this point in time to see how it all updates.
-    this->printHGrid();
+    //this->printHGrid();
     offerHGridValue(GridPoint(cell.x + 1, cell.y), value + 1);
     offerHGridValue(GridPoint(cell.x - 1, cell.y), value + 1);
     offerHGridValue(GridPoint(cell.x, cell.y + 1), value + 1);
     offerHGridValue(GridPoint(cell.x, cell.y - 1), value + 1);
 }
+
 void World::printHGrid(){
   Serial.begin(9600);
+  Serial.println("Heuristic Grid:");
     for (int a = 0; a < hGridXMax; a++) {
         for (int b = 0; b < hGridYMax; b++){
             if(this->hGrid[a][b] >=0 && this->hGrid[a][b] < 10) {Serial.print(" ");}
@@ -48,7 +51,24 @@ void World::printHGrid(){
         }
         Serial.println();
     }
-    Serial.println();  
+  Serial.println();
+  Serial.flush();
+  Serial.end();  
+}
+
+void World::printOGrid(){
+  Serial.begin(9600);
+  Serial.println("Obstacle Grid:");
+    for (int c = 0; c < scaledXMax; c++) {
+        for (int d = 0; d < scaledYMax; d++){
+            Serial.print(this->oGrid[c][d]);
+            Serial.print("  ");
+        }
+        Serial.println();
+    }
+  Serial.println();
+  Serial.flush();  
+  Serial.end();
 }
 
 void World::registerObstacle(Point obstaclePoint) {

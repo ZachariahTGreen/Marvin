@@ -104,6 +104,13 @@ void Robot::turn(Radians angle) {
   this->servoLeft.detach();
   this->servoRight.detach();
 }
-String Robot::toString(){
-
+void Robot::printRobot(){
+    Serial.begin(9600);
+    Serial.print("Center: ");
+    Serial.print(this->center.toString());
+    Serial.print("  Orientation: ");
+    Serial.print(orientation);
+    Serial.println();
+    Serial.flush();
+    Serial.end();
 }

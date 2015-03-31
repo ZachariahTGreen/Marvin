@@ -39,6 +39,7 @@ public:
     Point nextStepNavigate(Point, Point);
     boolean isGridSectionFree(GridPoint point);
     void printHGrid();
+    void printOGrid();
 private:
     short oGrid[scaledXMax][scaledYMax];
     int calculateHeuristicDistance(GridPoint);
