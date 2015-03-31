@@ -104,3 +104,6 @@ void Robot::turn(Radians angle) {
   this->servoLeft.detach();
   this->servoRight.detach();
 }
+String Robot::toString(){
+
+}

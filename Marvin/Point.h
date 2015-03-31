@@ -11,7 +11,7 @@ public:
   Point();
   Point(Inches, Inches);
   double calculateDistance(Point);
-  void toString();  
+  String toString();  
 };
 
 #endif

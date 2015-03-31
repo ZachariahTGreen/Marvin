@@ -33,6 +33,7 @@ public:
     Point getCenter();
     void moveTo(Point);
     void adjustHeading(Point);
+    String toString();
 //private:
     Point center;
     Radians orientation;

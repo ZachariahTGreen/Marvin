@@ -1,33 +1,81 @@
 #include "World.h"
 #include "math.h"
-World::World() {
+World::World(Point destination) : destination(destination){
     for (int i = 0; i < scaledXMax; i++) {
         for (int j = 0; j < scaledYMax; j++) {
-            this->grid[i][j] = 0;
+            this->oGrid[i][j] = 0;
         }
     }
+    
+    this->updateHGrid();
+}
+
+void World::resetHGrid(){
+  for (int i = 0; i < hGridXMax; i++) {
+    for (int j = 0; j < hGridYMax; j++) {
+      this->hGrid[i][j] = -1;
+    }
+  }
+}
+
+void World::updateHGrid(){
+  this->resetHGrid();
+  this->offerHGridValue(this->destination, 0);
+}
+
+void World::offerHGridValue(GridPoint cell, int value){
+    if(!isGridSectionFree(cell)) { return; }
+
+    int gridValue = this->hGrid[cell.x - 1][cell.y - 1];
+    if(0 <= gridValue && gridValue <= value) { return; }
+
+    this->hGrid[cell.x - 1][cell.y - 1] = value;
+    
+    // Print the hGrid at this point in time to see how it all updates.
+    this->printHGrid();
+    offerHGridValue(GridPoint(cell.x + 1, cell.y), value + 1);
+    offerHGridValue(GridPoint(cell.x - 1, cell.y), value + 1);
+    offerHGridValue(GridPoint(cell.x, cell.y + 1), value + 1);
+    offerHGridValue(GridPoint(cell.x, cell.y - 1), value + 1);
+}
+void World::printHGrid(){
+  Serial.begin(9600);
+    for (int a = 0; a < hGridXMax; a++) {
+        for (int b = 0; b < hGridYMax; b++){
+            if(this->hGrid[a][b] >=0 && this->hGrid[a][b] < 10) {Serial.print(" ");}
+            Serial.print(this->hGrid[a][b]);
+            Serial.print("  ");
+        }
+        Serial.println();
+    }
+    Serial.println();  
 }
 
 void World::registerObstacle(Point obstaclePoint) {
-  //registers an obstacle into the grid
-    this->grid[(int)(obstaclePoint.x / scaleFactor)][(int)(obstaclePoint.y / scaleFactor)] = 1;
+    GridPoint gp(obstaclePoint);
+    if (oGrid[gp.x][gp.y] == 0) {
+        this->oGrid[gp.x][gp.y] = 1;
+        updateHGrid();
+    }
 }
 
-boolean World::isFree(Point point) {
-  //returns if there is an obstacle or not
-    return this->grid[(int)(point.x / scaleFactor)][(int)(point.y / scaleFactor)] == 0 && 
-        //check for edge of world
-        point.x / scaleFactor <= scaledXMax && point.y / scaleFactor <= scaledYMax;
+boolean World::isFree(GridPoint point) {
+    return (
+        0 <= point.x && point.x < scaledXMax &&
+        0 <= point.y && point.y < scaledYMax &&
+        this->oGrid[point.x][point.y] == 0
+    );
 }
+
 boolean World::isGridSectionFree(GridPoint point){
    //Check to make sure all points on the grid section are free
-   GridPoint down(point.x, point.y - 1);
+   GridPoint down(point.x, point.y - 1); 
    GridPoint left(point.x - 1, point.y);
    GridPoint downLeft(point.x - 1, point.y - 1);
    
-   return isFree(point.getPoint()) && isFree(down.getPoint()) 
-          && isFree(left.getPoint()) && isFree(downLeft.getPoint());
+   return isFree(point) && isFree(down) && isFree(left) && isFree(downLeft);
 }
+
 Point World::nextStepNavigate(Point center, Point destination) {
   GridPoint start(center);
   GridPoint target(destination);
@@ -46,10 +94,10 @@ Point World::nextStepNavigate(Point center, Point destination) {
 
   // Check all options to find the best one.
     for (int i = 0; i < optionsLength; i++){
-        GridPoint& option = options[i];
-        if (!isGridSectionFree(option)){ continue; }
+        GridPoint option = options[i];
+        if (!isGridSectionFree(option)) { continue; }
 
-        int distance = calculateHeuristicDistance(option, target);
+        int distance = calculateHeuristicDistance(option);
         if (distance >= nearestDistance) { continue; }
 
         nearestDistance = distance;
@@ -59,7 +107,7 @@ Point World::nextStepNavigate(Point center, Point destination) {
   return nearest.getPoint();
 }
 
-int World::calculateHeuristicDistance(GridPoint start, GridPoint target) {
-  //calculate Heuristic value (update to work better)
-  return abs(target.x - start.x) + abs(target.y - start.y);
+int World::calculateHeuristicDistance(GridPoint gp) {
+  if (0 > gp.x || gp.x >= hGridXMax || 0 > gp.y || gp.y >= hGridYMax) { return 1 << 10; }
+  return this->hGrid[gp.x][gp.y];
 }

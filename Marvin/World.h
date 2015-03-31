@@ -8,8 +8,10 @@ const int xMax = 48;
 const int yMax = 78;
 
 const int scaleFactor = 4;
-const int scaledXMax = xMax / scaleFactor;
-const int scaledYMax = yMax / scaleFactor;
+const int scaledXMax = (xMax / scaleFactor) + 1;
+const int scaledYMax = (yMax / scaleFactor) + 1;
+const int hGridXMax = scaledXMax - 1;
+const int hGridYMax = scaledYMax - 1;
 
 class GridPoint {
 public:
@@ -22,8 +24,8 @@ public:
         this->y = y;
     }
     GridPoint(Point point) {
-        this->x = point.x / scaleFactor;
-        this->y = point.y / scaleFactor;
+        this->x = (int)(point.x / scaleFactor);
+        this->y = (int)(point.y / scaleFactor);
     }
     Point getPoint() {
         return Point(this->x * scaleFactor, this->y * scaleFactor);
@@ -32,15 +34,23 @@ public:
 
 class World {
 public:
-    World();
+    World(Point);
     void registerObstacle(Point);
-    boolean isFree(Point);
     Point nextStepNavigate(Point, Point);
     boolean isGridSectionFree(GridPoint point);
+    void printHGrid();
 private:
-    short grid[scaledXMax][scaledYMax];
-    int calculateHeuristicDistance(GridPoint, GridPoint);
+    short oGrid[scaledXMax][scaledYMax];
+    int calculateHeuristicDistance(GridPoint);
+    
+    boolean isFree(GridPoint);
+
+    // Heuristic Grid
+    int hGrid[hGridXMax][hGridYMax];
+    void resetHGrid();
+    void updateHGrid();
+    void offerHGridValue(GridPoint cell, int value);
+    GridPoint destination;
 };
 
 #endif
-

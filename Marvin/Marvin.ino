@@ -5,11 +5,13 @@
 #include "math.h"
 #include "Point.h"
 
-Robot robot;
-World world;
 Point destination(23, 46);
+Robot robot;
+World world(destination);
+
 
 void setup() {
+  /*
   robot.startPosition();
 
   while (robot.getCenter().calculateDistance(destination) > 0.5) {

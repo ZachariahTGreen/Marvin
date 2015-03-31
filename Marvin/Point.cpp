@@ -17,8 +17,12 @@ double Point::calculateDistance(Point other){
   return sqrt(square(other.x - this->x) + square(other.y - this->y));
 }
 
-void Point::toString() {
-  //still working no this
+String Point::toString() {
+  //converts the point variables into a string
   char buff[6];
+  char buff0[6];
   String strx = dtostrf(this->x, 4, 2, buff);
+  String stry = dtostrf(this->y, 4, 2, buff0);
+  String point = "(" + strx + "," + stry + ")";
+  return point;
 }
