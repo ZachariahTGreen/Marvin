@@ -13,6 +13,8 @@ typedef double Radians;
 typedef float Inches;
 typedef long Microseconds;
 
+const int SAMPLE_SIZE = 6;
+
 
 class Sensor {
 public:
@@ -24,5 +26,6 @@ public:
     Pin pin;
     Radians orientation;
     Inches offset;
+    Inches readSample();
 };
 #endif

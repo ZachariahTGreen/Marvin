@@ -9,19 +9,26 @@ Point destination(23, 46);
 Robot robot;
 World world(destination);
 
-
 void setup() {
-  robot.startPosition();
-  robot.printRobot();
-  world.printOGrid();
-  world.printHGrid();
-  
-  
-  //
+  /*Testing Movement  
+  //one spot to the left
+  Inches testX = (robot.getCenter().x) - 5;
+  Inches testY = (robot.getCenter().y) - 5;
+  //test robot's moveTo method
+  Point test(testX,testY);
+  Serial.begin(9600);
+  Serial.print(test.toString());
+  robot.moveTo(test);
+  */
   
   /*
   robot.startPosition();
-
+  updateWorldObstacles();
+  printInformation();
+  */
+  /*
+  robot.startPosition();
+  
   while (robot.getCenter().calculateDistance(destination) > 0.5) {
     updateWorldObstacles();
     Point nextNavPoint = world.nextStepNavigate(robot.getCenter(), destination);
@@ -53,5 +60,9 @@ void updateWorldObstacles() {
   world.registerObstacle(robot.rightSensor->getObstacle());
   world.registerObstacle(robot.leftSensor->getObstacle());
 }
-
+void printInformation(){
+    robot.printRobot();
+    world.printOGrid();
+    world.printHGrid();
+}
 

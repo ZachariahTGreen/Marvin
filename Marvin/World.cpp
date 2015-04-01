@@ -43,10 +43,10 @@ void World::offerHGridValue(GridPoint cell, int value){
 void World::printHGrid(){
   Serial.begin(9600);
   Serial.println("Heuristic Grid:");
-    for (int a = 0; a < hGridXMax; a++) {
-        for (int b = 0; b < hGridYMax; b++){
-            if(this->hGrid[a][b] >=0 && this->hGrid[a][b] < 10) {Serial.print(" ");}
-            Serial.print(this->hGrid[a][b]);
+    for (int a = 0; a < hGridYMax; a++) {
+        for (int b = 0; b < hGridXMax; b++){
+            if(this->hGrid[b][a] >=0 && this->hGrid[b][a] < 10) {Serial.print(" ");}
+            Serial.print(this->hGrid[b][a]);
             Serial.print("  ");
         }
         Serial.println();
@@ -59,9 +59,9 @@ void World::printHGrid(){
 void World::printOGrid(){
   Serial.begin(9600);
   Serial.println("Obstacle Grid:");
-    for (int c = 0; c < scaledXMax; c++) {
-        for (int d = 0; d < scaledYMax; d++){
-            Serial.print(this->oGrid[c][d]);
+    for (int c = 0; c < scaledYMax; c++) {
+        for (int d = 0; d < scaledXMax; d++){
+            Serial.print(this->oGrid[d][c]);
             Serial.print("  ");
         }
         Serial.println();
