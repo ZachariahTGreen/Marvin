@@ -18,6 +18,20 @@ Inches microsecondsToInches(Microseconds microseconds) {
 }
 
 Inches Sensor::getFreeDistance() {
+  Inches total = 0;
+  Inches high = -1;
+  Inches low = -1;
+  for(int i = 0; i < SAMPLE_SIZE; i++){
+    Inches sample = this->readSample();
+    if (low == -1 || sample < low) { low = sample; }
+    if (high == -1 || sample > high) { high = sample; }
+    total += sample;
+  }
+  total -= low;
+  total -= high;
+  return total / (SAMPLE_SIZE - 2);
+}
+Inches Sensor::readSample(){
   // The PING))) is triggered by a HIGH pulse of 2 or more microseconds.
   Pin pin = this->pin;
   Microseconds duration;
@@ -33,29 +47,26 @@ Inches Sensor::getFreeDistance() {
   delay(100);
   return microsecondsToInches(duration);
 }
-Inches Sensor::readSample(){
-  Inches total = 0;
-  Inches high = -1;
-  Inches low = -1;
-  for(int i = 0; i < SAMPLE_SIZE; i++){
-    Inches sample = this->getFreeDistance();
-    if (low == -1 || sample < low) { low = sample; }
-    if (high == -1 || sample > high) { high = sample; }
-    total += sample;
-  }
-  total -= (low + high);
-  return total / (SAMPLE_SIZE - 2);
-}
-Point Sensor::getObstacle() {
-    Inches sampleDistance = this->readSample();
-    Radians sensorFacing = this->robot->getOrientation() + this->orientation;
-    
-    Point center = this->robot->getCenter();
 
+Point Sensor::getObstacle() {
+        
+    Inches sampleDistance = this->getFreeDistance();
+        
+    Radians sensorFacing = this->robot->getOrientation() + this->orientation;
+        
+    Point center = this->robot->getCenter();
+    Inches sampleDistanceFromCenter = this->offset + sampleDistance; // Here, have loads of printing.
+        
+    Radians angleFactorX = cos(sensorFacing);
+    Radians angleFactorY = sin(sensorFacing);
+        
+    Inches obsX = center.x + sampleDistanceFromCenter * angleFactorX;
+    Inches obsY = center.y + sampleDistanceFromCenter * angleFactorY;
+        
     Point obstacle;
-    obstacle.x = center.x + ((this->offset + sampleDistance) * cos(sensorFacing));
-    obstacle.y = center.y + ((this->offset + sampleDistance) * sin(sensorFacing));
-    
-    return obstacle;
+    obstacle.x = obsX;//center.x + sampleDistanceFromCenter * cos(sensorFacing); //gets a negative value, when should be like 20s or something
+    obstacle.y = obsY;//center.y + sampleDistanceFromCenter * sin(sensorFacing);
+            
+    return obstacle;    
 }
 

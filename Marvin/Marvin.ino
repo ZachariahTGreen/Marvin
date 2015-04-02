@@ -10,6 +10,18 @@ Robot robot;
 World world(destination);
 
 void setup() {
+  robot.startPosition();
+  updateWorldObstacles();
+  printInformation();
+  /*
+  float value1 = -3.5;
+  float value2 = 56.7;
+  String str = testToString(value1, value2);
+  Serial.begin(9600);
+  Serial.print(str);
+  */
+  /*
+  
   /*Testing Movement  
   //one spot to the left
   Inches testX = (robot.getCenter().x) - 5;
@@ -65,4 +77,5 @@ void printInformation(){
     world.printOGrid();
     world.printHGrid();
 }
+
 

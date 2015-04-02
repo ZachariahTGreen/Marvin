@@ -4,7 +4,7 @@ Robot::Robot() {
 
     this->center.x = 0;
     this->center.y = 0;
-    this->orientation = M_PI_2;
+    this->orientation = 0;
     
     this->frontSensor = new Sensor(this, PIN_FRONT, M_PI_2, verticalOffset);
     this->backSensor = new Sensor(this, PIN_BACK, (-M_PI_2), verticalOffset);
@@ -29,7 +29,7 @@ Point Robot::getCenter() {
 
 void Robot::startPosition() {
   //This works only if no objects in the way of the four sensors.
-  long front,left,right,back;
+  Inches front,left,right,back;
   int xDifference;
   int yDifference;
   //loops until it gets a good reading for center point since sensors vary in readings
