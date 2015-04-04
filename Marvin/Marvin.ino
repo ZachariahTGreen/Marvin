@@ -10,42 +10,71 @@ Robot robot;
 World world(destination);
 
 void setup() {
+  /*
   robot.startPosition();
   updateWorldObstacles();
   printInformation();
-  /*
-  float value1 = -3.5;
-  float value2 = 56.7;
-  String str = testToString(value1, value2);
-  Serial.begin(9600);
-  Serial.print(str);
-  */
-  /*
-  
-  /*Testing Movement  
-  //one spot to the left
-  Inches testX = (robot.getCenter().x) - 5;
-  Inches testY = (robot.getCenter().y) - 5;
+  */  
+  /*Testing Movement
+  robot.startPosition();
+  robot.printRobot();
+  Point test;
+  Inches testX;
+  Inches testY;  
+  /*one spot to the left
+  testX = (robot.getCenter().x) - 5;
+  testY = (robot.getCenter().y);
   //test robot's moveTo method
-  Point test(testX,testY);
+  test.x = testX;
+  test.y = testY;
   Serial.begin(9600);
   Serial.print(test.toString());
   robot.moveTo(test);
-  */
+  /*/
+  /*one spot to the right
+  testX = (robot.getCenter().x) + 5;
+  testY = (robot.getCenter().y);
+  //test robot's moveTo method
+  test.x = testX;
+  test.y = testY;
+  robot.moveTo(test);
+  /*/
+  /*one spot forward
+  testX = (robot.getCenter().x);
+  testY = (robot.getCenter().y) + 5;
+  //test robot's moveTo method
+  test.x = testX;
+  test.y = testY;
+  Serial.begin(9600);
+  Serial.print(test.toString());
+  robot.moveTo(test);
+  /*/
+  /*one spot backward
+  testX = (robot.getCenter().x);
+  testY = (robot.getCenter().y) - 5;
+  //test robot's moveTo method
+  test.x = testX;
+  test.y = testY;
+  Serial.begin(9600);
+  Serial.print(test.toString());
+  robot.moveTo(test);
+  /*/
   
   /*
   robot.startPosition();
   updateWorldObstacles();
   printInformation();
   */
-  /*
+  //*
   robot.startPosition();
   
   while (robot.getCenter().calculateDistance(destination) > 0.5) {
     updateWorldObstacles();
+    printInformation();
     Point nextNavPoint = world.nextStepNavigate(robot.getCenter(), destination);
     robot.moveTo(nextNavPoint);
-  }*/
+  }
+  /*/
   /*
   //Test turning
   robot.turn(M_PI_2);

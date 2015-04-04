@@ -3,6 +3,8 @@
 
 #include <Arduino.h>
 #include "Point.h"
+//used to convert values to strings
+
 
 const int xMax = 48;
 const int yMax = 78;
@@ -29,6 +31,15 @@ public:
     }
     Point getPoint() {
         return Point(this->x * scaleFactor, this->y * scaleFactor);
+    }
+    String toString(){
+        //converts the point variables into a string
+        Point point = this->getPoint();
+        String pointstr = point.toString();
+        String strx = String(this->x);
+        String stry = String(this->y);        
+        String Gpoint = "(" + strx + "," + stry + ")" + " " + pointstr;
+        return Gpoint;
     }
 };
 

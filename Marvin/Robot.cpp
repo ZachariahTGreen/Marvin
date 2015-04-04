@@ -30,15 +30,15 @@ Point Robot::getCenter() {
 void Robot::startPosition() {
   //This works only if no objects in the way of the four sensors.
   Inches front,left,right,back;
-  int xDifference;
-  int yDifference;
+  Inches xDifference;
+  Inches yDifference;
   //loops until it gets a good reading for center point since sensors vary in readings
   while (this->center.y == 0){
     front = this->frontSensor->getFreeDistance() + verticalOffset;
     back = this->backSensor->getFreeDistance() + verticalOffset;
     yDifference = yMax - front - back; 
 
-    if (yDifference == 0){
+    if (yDifference < .01){
       this->center.y = back;
     }
   }
@@ -47,7 +47,7 @@ void Robot::startPosition() {
     left = this->leftSensor->getFreeDistance() + horizontalOffset;
     xDifference = xMax - right - left;
     
-    if (xDifference == 0){
+    if (xDifference < .01){
       this->center.x = left;
     }
   }
@@ -76,23 +76,25 @@ void Robot::moveTo(Point point){
 }
 void Robot::adjustHeading(Point point){
   // adjusts heading toward destination
-  double Yheading, Xheading, headingRadians;
-  Xheading = point.x - this->center.x;
-  Yheading = point.y - this->center.y;
-  headingRadians = atan2(Xheading, Yheading);
-  this->turn(abs(headingRadians));
+  double xHeading = point.x - this->center.x;
+  double yHeading = point.y - this->center.y;
+  double headingRadians = atan2(yHeading, xHeading) - this->orientation - M_PI_2;
+  this->turn(headingRadians);
 }
 void Robot::turn(Radians angle) {
+  const int TAU = 2 * M_PI;
+  while (angle > TAU) { angle -= TAU; }
+  while (angle < -TAU) { angle += TAU; }
+
+  //update robot facing for turning
+  this->orientation += angle;
+  
   // Turn Left angle radians / Turn Right -angle radians 
   boolean isLeft = angle > 0;
-  //update robot facing for turning
-  this->orientation = orientation + angle;
-  
-  angle = abs(angle);
 
   // These values come from calibrating the robot
   int directionCode = isLeft ? 1300 : 1700;
-  int duration = (int)(angle / M_PI_2 * leftTurnDuration) - (isLeft ? 0 : rightTurnAdjustment);
+  int duration = (int)(abs(angle) / M_PI_2 * leftTurnDuration) - (isLeft ? 0 : rightTurnAdjustment);
   
   this->servoLeft.attach(PIN_SERVO_LEFT); 
   this->servoRight.attach(PIN_SERVO_RIGHT); 

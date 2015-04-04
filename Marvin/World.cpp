@@ -100,7 +100,8 @@ boolean World::isGridSectionFree(GridPoint point){
 Point World::nextStepNavigate(Point center, Point destination) {
   GridPoint start(center);
   GridPoint target(destination);
-  
+  Serial.begin(9600);
+  Point nextStep;
   // Get adjacent points
   GridPoint up(start.x, start.y + 1);
   GridPoint down(start.x, start.y - 1);
@@ -108,23 +109,22 @@ Point World::nextStepNavigate(Point center, Point destination) {
   GridPoint left(start.x - 1, start.y);
 
   const int optionsLength = 4;
-  GridPoint options[optionsLength] = {right, up, down, left};
+  GridPoint options[optionsLength] = {up, left, right, down};
 
   GridPoint nearest;
-  int nearestDistance = 1 << 30; // Just a value too large to ever come out as the minimum, we should hope.
-
+  int nearestDistance = 1 << 10; // Just a value too large to ever come out as the minimum, we should hope.
   // Check all options to find the best one.
     for (int i = 0; i < optionsLength; i++){
         GridPoint option = options[i];
         if (!isGridSectionFree(option)) { continue; }
-
+        
         int distance = calculateHeuristicDistance(option);
+        
         if (distance >= nearestDistance) { continue; }
-
+        
         nearestDistance = distance;
-        nearest = option;
+        nearest = option;          
     }
-
   return nearest.getPoint();
 }
 

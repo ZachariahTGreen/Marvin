@@ -14,7 +14,7 @@ Inches microsecondsToInches(Microseconds microseconds) {
   // second).  This gives the distance travelled by the ping, outbound
   // and return, so we divide by 2 to get the distance of the obstacle.
   // See: http://www.parallax.com/dl/docs/prod/acc/28015-PING-v1.3.pdf
-  return (microseconds / (73.746 * 2));
+  return (microseconds / (74 * 2));
 }
 
 Inches Sensor::getFreeDistance() {
