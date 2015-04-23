@@ -8,7 +8,7 @@ class Robot;
 #include "Point.h"
 #include "World.h"
 #include "Sensor.h"
-#include "InputOutput.h"
+#include "IOPins.h"
 
 const Inches verticalOffset = 3.6;
 const Inches horizontalOffset = 3.1;

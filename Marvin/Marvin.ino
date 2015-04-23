@@ -4,7 +4,7 @@
 #include "Sensor.h"
 #include "math.h"
 #include "Point.h"
-#include "InputOutput.h"
+#include "IOPins.h"
 
 Point destination(16, 52);
 Robot robot;

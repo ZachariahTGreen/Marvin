@@ -1,6 +1,6 @@
 #include "Sensor.h"
 
-Sensor::Sensor(Robot* robot, InputOutput pin, Radians orientation, Inches offset) {
+Sensor::Sensor(Robot* robot, IOPins pin, Radians orientation, Inches offset) {
     // We assume that the Sensor is pointed directly away from the center of the robot. Is this true? Yes
     this->robot = robot;
     this->pin = pin;
@@ -37,7 +37,7 @@ Inches Sensor::getFreeDistance() {
 }
 Inches Sensor::readSample(){
   // The PING))) is triggered by a HIGH pulse of 2 or more microseconds.
-  InputOutput pin = this->pin;
+  IOPins pin = this->pin;
   Microseconds duration;
   pinMode(pin, OUTPUT);
   digitalWrite(pin, LOW);

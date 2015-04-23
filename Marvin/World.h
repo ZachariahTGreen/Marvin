@@ -57,7 +57,7 @@ public:
         this->x = (int)(point.x / scaleFactor) - 1;
         this->y = (int)(point.y / scaleFactor) - 1;
     }
-    override Point getPoint() {
+    Point getPoint() {
         return Point((this->x + 1) * scaleFactor, (this->y + 1) * scaleFactor);
     }
 };

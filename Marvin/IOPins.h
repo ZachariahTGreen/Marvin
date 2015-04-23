@@ -1,6 +1,6 @@
-#ifndef InputOutput_h
-#define InputOutput_h
-enum InputOutput : int {
+#ifndef IOPins_h
+#define IOPins_h
+enum IOPins : int {
     PIN_FRONT = 4,
     PIN_RIGHT = 2,
     PIN_LEFT = 8,
@@ -11,6 +11,6 @@ enum InputOutput : int {
     PIN_SERVO_LEFT = 12,
     PIN_BUZZER = 5,
 };
-typedef enum InputOutput InputOutput;
+typedef enum IOPins IOPins;
 #endif
 
