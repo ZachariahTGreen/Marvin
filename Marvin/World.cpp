@@ -25,7 +25,7 @@ void World::updateHGrid(){
 
 void World::offerHGridValue(GridPoint cell, int value){
     if(!isGridSectionFree(cell)) { return; }
-    if(value > 20) { return; } 
+    if(value > 30) { return; } 
 
     int gridValue = this->hGrid[cell.x - 1][cell.y - 1];
     if(0 <= gridValue && gridValue <= value) { return; }
@@ -73,10 +73,12 @@ void World::printOGrid(){
 }
 
 void World::registerObstacle(Point obstaclePoint) {
-    GridPoint gp(obstaclePoint);
-    if (oGrid[gp.x][gp.y] == 0) {
-        this->oGrid[gp.x][gp.y] = 1;
-        updateHGrid();
+    if (obstaclePoint.x <= xMax && obstaclePoint.y <= yMax){ 
+        GridPoint gp(obstaclePoint);
+        if (oGrid[gp.x][gp.y] == 0) {
+            this->oGrid[gp.x][gp.y] = 1;
+            updateHGrid();
+        }
     }
 }
 
@@ -90,45 +92,65 @@ boolean World::isFree(GridPoint point) {
 
 boolean World::isGridSectionFree(GridPoint point){
    //Check to make sure all points on the grid section are free
+   
    GridPoint down(point.x, point.y - 1); 
    GridPoint left(point.x - 1, point.y);
    GridPoint downLeft(point.x - 1, point.y - 1);
-   
-   return isFree(point) && isFree(down) && isFree(left) && isFree(downLeft);
+      
+   return isFree(point) && isFree(down) && isFree(left) && isFree(downLeft); 
 }
 
-Point World::nextStepNavigate(Point center, Point destination) {
-  GridPoint start(center);
-  GridPoint target(destination);
-  Serial.begin(9600);
-  Point nextStep;
+Point World::nextStepNavigate(Point center) {
+  HGridPoint start(center);
+
   // Get adjacent points
-  GridPoint up(start.x, start.y + 1);
-  GridPoint down(start.x, start.y - 1);
-  GridPoint right(start.x + 1, start.y);
-  GridPoint left(start.x - 1, start.y);
+  HGridPoint up(start.x, start.y + 1);
+  HGridPoint down(start.x, start.y - 1);
+  HGridPoint right(start.x + 1, start.y);
+  HGridPoint left(start.x - 1, start.y);
 
+  //Print gridpoints for testing
+  Serial.begin(9600);
+  Serial.print(start.toString());
+  Serial.println();
+  
   const int optionsLength = 4;
-  GridPoint options[optionsLength] = {up, left, right, down};
+  HGridPoint options[optionsLength] = {up, left, right, down};
 
-  GridPoint nearest;
-  int nearestDistance = 1 << 10; // Just a value too large to ever come out as the minimum, we should hope.
+  HGridPoint nearest;
+  int nearestDistance = highestHValue; // Just a value too large to ever come out as the minimum.
   // Check all options to find the best one.
     for (int i = 0; i < optionsLength; i++){
-        GridPoint option = options[i];
-        if (!isGridSectionFree(option)) { continue; }
+        HGridPoint option = options[i];
+        Serial.print("option: ");
+        Serial.print(option.toString());
+        Serial.println();
+        if (hGrid[option.x][option.y] == -1) { continue; }
         
         int distance = calculateHeuristicDistance(option);
-        
+        Serial.print("distance: ");
+        Serial.print(distance);
+        Serial.println();
         if (distance >= nearestDistance) { continue; }
         
         nearestDistance = distance;
-        nearest = option;          
+        Serial.print("nearestDistance: ");
+        Serial.print(nearestDistance);
+        Serial.println();
+        nearest = option;
+        Serial.print("nearest: ");
+        Serial.print(nearest.toString());
+        Serial.println();        
     }
+  Serial.flush();
+  Serial.end();
   return nearest.getPoint();
 }
-
-int World::calculateHeuristicDistance(GridPoint gp) {
-  if (0 > gp.x || gp.x >= hGridXMax || 0 > gp.y || gp.y >= hGridYMax) { return 1 << 10; }
+boolean World::isAtDestination(Point center){
+    HGridPoint gp(center);
+    return (calculateHeuristicDistance(gp) == 0);  
+}
+int World::calculateHeuristicDistance(HGridPoint gp) {
+  if (0 > gp.x || gp.x >= hGridXMax || 0 > gp.y || gp.y >= hGridYMax) { return highestHValue; }
   return this->hGrid[gp.x][gp.y];
 }

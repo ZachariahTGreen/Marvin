@@ -9,8 +9,8 @@ Robot::Robot() {
     this->frontSensor = new Sensor(this, PIN_FRONT, M_PI_2, verticalOffset);
     this->backSensor = new Sensor(this, PIN_BACK, (-M_PI_2), verticalOffset);
     this->rightSensor = new Sensor(this, PIN_RIGHT, 0, horizontalOffset);
-    this->leftSensor = new Sensor(this, PIN_LEFT, M_PI , horizontalOffset);
-    this->frontRightSensor = new Sensor(this, PIN_FRONT_RIGHT, M_PI_4, angleOffset);
+    this->leftSensor = new Sensor(this, PIN_LEFT, M_PI, horizontalOffset);
+    this->frontRightSensor = new Sensor(this, PIN_FRONT_RIGHT, (M_PI_4), angleOffset);
     this->frontLeftSensor = new Sensor(this, PIN_FRONT_LEFT, (M_PI_2 + M_PI_4), angleOffset);
     
     //this->sensors = new Sensor[]{ this->frontSensor, this->backSensor, this->rightSensor, this->leftSensor, this->frontRightSensor, this->frontLeftSensor };
@@ -32,38 +32,44 @@ void Robot::startPosition() {
   Inches front,left,right,back;
   Inches xDifference;
   Inches yDifference;
+  back = this->backSensor->getFreeDistance() + verticalOffset;
+  left = this->leftSensor->getFreeDistance() + horizontalOffset;
+  this->center.y = back;
+  this->center.x = left;
   //loops until it gets a good reading for center point since sensors vary in readings
-  while (this->center.y == 0){
+  /*while (this->center.y == 0){
     front = this->frontSensor->getFreeDistance() + verticalOffset;
     back = this->backSensor->getFreeDistance() + verticalOffset;
     yDifference = yMax - front - back; 
 
-    if (yDifference < .01){
+    if (yDifference < .1){
       this->center.y = back;
-    }
+  /*  }
   }
   while (this->center.x == 0){
     right = this->rightSensor->getFreeDistance() + horizontalOffset;
     left = this->leftSensor->getFreeDistance() + horizontalOffset;
     xDifference = xMax - right - left;
     
-    if (xDifference < .01){
+    if (xDifference < .1){
       this->center.x = left;
     }
-  }
+  }*/
 }
 
 void Robot::moveForward(double distance){
-  double duration;
-  duration = (distance/forwardSpeed) * 1000;
+  double duration = (distance/forwardSpeed) * 1000;
+
   this->servoLeft.attach(PIN_SERVO_LEFT); 
   this->servoRight.attach(PIN_SERVO_RIGHT);
   this->servoLeft.writeMicroseconds(forwardLeftSpeed);
   this->servoRight.writeMicroseconds(forwardRightSpeed);
   delay(duration);
+
   // Update current position while moving
-  this->center.x = this->center.x + (distance * cos(this->orientation));
-  this->center.y = this->center.y + (distance * sin(this->orientation));
+  this->center.x += distance * cos(this->orientation + M_PI_2);
+  this->center.y += distance * sin(this->orientation + M_PI_2);
+
   this->servoLeft.detach();
   this->servoRight.detach();
 }
@@ -73,7 +79,9 @@ void Robot::moveTo(Point point){
   distance = sqrt(square(point.x - this->center.x) + square(point.y - this->center.y));
   adjustHeading(point);
   moveForward(distance);
+  
 }
+
 void Robot::adjustHeading(Point point){
   // adjusts heading toward destination
   double xHeading = point.x - this->center.x;
@@ -81,6 +89,7 @@ void Robot::adjustHeading(Point point){
   double headingRadians = atan2(yHeading, xHeading) - this->orientation - M_PI_2;
   this->turn(headingRadians);
 }
+
 void Robot::turn(Radians angle) {
   const int TAU = 2 * M_PI;
   while (angle > TAU) { angle -= TAU; }
@@ -91,7 +100,7 @@ void Robot::turn(Radians angle) {
   
   // Turn Left angle radians / Turn Right -angle radians 
   boolean isLeft = angle > 0;
-
+  
   // These values come from calibrating the robot
   int directionCode = isLeft ? 1300 : 1700;
   int duration = (int)(abs(angle) / M_PI_2 * leftTurnDuration) - (isLeft ? 0 : rightTurnAdjustment);
